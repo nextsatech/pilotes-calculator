@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diseño de Pilotes - Geotecnia II</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f5f7;
+            color: #333;
+            margin: 0;
+            padding: 0; 
+        }
+        
+        #pantalla-inicio {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(15, 32, 39, 0.85), rgba(32, 58, 67, 0.85), rgba(44, 83, 100, 0.85)),
+                        url('https://www.zuloaga.online/cimientosprofundos/wp-content/uploads/sites/11/2024/02/Pilotes-de-Desplazamiento.webp') center/cover no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+
+        .presentacion-card {
+            background: #ffffff;
+            padding: 60px 50px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .presentacion-card h1 {
+            margin: 0 0 15px 0;
+            font-size: 32px;
+            color: #1a1a1a;
+            letter-spacing: -0.5px;
+        }
+
+        .linea-separadora {
+            width: 60px;
+            height: 4px;
+            background-color: #0066cc;
+            margin: 0 auto 30px auto;
+            border-radius: 2px;
+        }
+
+        .presentacion-card .creditos {
+            font-size: 16px;
+            color: #444;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .presentacion-card .subtitulo {
+            font-size: 13px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 40px;
+            font-weight: 600;
+        }
+
+        .btn-comenzar {
+            background-color: #0066cc;
+            color: #fff;
+            border: none;
+            padding: 16px 36px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+        }
+
+        .btn-comenzar:hover {
+            background-color: #0055b3;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
+        }
+
+        #app-principal {
+            display: none; 
+            max-width: 950px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .estrato-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        input, select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+        .estrato-box {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #fafafa;
+            border-radius: 6px;
+        }
+        .btn-accion {
+            background-color: #444;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        .btn-accion:hover {
+            background-color: #222;
+        }
+        #resultados {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #ccc;
+            display: none;
+        }
+        .res-line {
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+        .friccion-neg {
+            color: #d9534f;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #999;
+            padding: 8px;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #eee;
+        }
+        .grupo-section {
+            background: #fdfdfd;
+            border: 1px dashed #bbb;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="pantalla-inicio">
+        <div class="presentacion-card">
+            <h1>Diseño de Cimentaciones Profundas</h1>
+            <div class="linea-separadora"></div>
+            <p class="creditos">
+                Desarrollado por:<br>
+                <strong>Andrés Romero | Lorenzo Romero | Johan Orozco</strong>
+            </p>
+            <p class="subtitulo">Con fines educativos • Geotecnia II</p>
+            <button id="btnComenzar" class="btn-comenzar">Comenzar Cálculo</button>
+        </div>
+    </div>
+
+    <div id="app-principal">
+        <h1 style="text-align: center; border-bottom: 1px solid #eee; padding-bottom: 15px;">Calculadora de Pilotes</h1>
+        <form id="calcForm">
+            <h2>Datos Generales del Pilote</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Material</label>
+                    <select id="material">
+                        <option value="concreto">Concreto (24 kN/m³)</option>
+                        <option value="madera">Madera (9 kN/m³)</option>
+                        <option value="metal">Metal (78 kN/m³)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Método de Instalación</label>
+                    <select id="tipo_pilote">
+                        <option value="hincado">Hincado</option>
+                        <option value="preexcavado">Pre excavado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Forma del Pilote</label>
+                    <select id="forma_pilote" onchange="actualizarCamposForma()">
+                        <option value="circular">Circular</option>
+                        <option value="cuadrada">Cuadrada</option>
+                        <option value="rectangular">Rectangular</option>
+                    </select>
+                </div>
+                
+                <div id="contenedor-dimensiones" style="display: contents;">
+                </div>
+
+                <div class="form-group">
+                    <label>Longitud Total (L) [m]</label>
+                    <input type="number" id="longitud" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Factor de Seguridad (FS)</label>
+                    <input type="number" id="fs" step="0.01" value="2.0" required>
+                </div>
+            </div>
+
+            <div class="grupo-section">
+                <h3 style="margin-top:0; color:#444;">Configuración de Grupo de Pilotes</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>N° Pilotes en X</label>
+                        <input type="number" id="grupo_nx" step="1" value="1" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>N° Pilotes en Y</label>
+                        <input type="number" id="grupo_ny" step="1" value="1" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Espaciamiento S [m]</label>
+                        <input type="number" id="grupo_s" step="0.01" value="0" required>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                <label style="margin: 0; font-weight: bold;">N° Estratos:</label>
+                <input type="number" id="num_estratos" value="1" min="1" max="5" style="width: 60px;">
+                <button type="button" id="btnGenerar" class="btn-accion" style="margin: 0;">Generar Estratos</button>
+            </div>
+
+            <div id="estratos-container"></div>
+
+            <button type="submit" class="btn-accion" style="width: 100%; padding: 15px; font-size: 16px; margin-top: 20px;">Ejecutar Cálculo Final</button>
+        </form>
+
+        <div id="resultados">
+            <h2>Resultados del Análisis</h2>
+            <div class="res-line">Resistencia por fuste (Σ Qf): <strong id="r_qs_pos"></strong> kN</div>
+            <div class="res-line friccion-neg">Fricción Negativa Estimada (Info): <strong id="r_qs_neg"></strong> kN</div>
+            <div class="res-line">Resistencia por punta (Qb): <strong id="r_qb"></strong> kN</div>
+            <div class="res-line">Peso propio del pilote (Wp): <strong id="r_peso"></strong> kN</div>
+            <br>
+            <div class="res-line">Capacidad Última Neta (Qu = Σ Qf + Qb - Wp): <strong id="r_qu"></strong> kN</div>
+            <div class="res-line">Carga Admisible (Qadm = Qu / FS): <strong id="r_qadm"></strong> kN</div>
+
+            <div id="seccion_grupo" style="display:none; margin-top: 30px;">
+                <h3 style="border-bottom: 1px solid #ccc; padding-bottom: 5px;">Análisis de Grupo de Pilotes</h3>
+                <div class="res-line">Capacidad Falla Individual (n × Qu): <strong id="r_qu_single_total"></strong> kN</div>
+                <div class="res-line">Capacidad Falla por Bloque (Qub_gb): <strong id="r_qu_bloque"></strong> kN</div>
+                <div class="res-line">Capacidad Última del Grupo: <strong id="r_qu_grupo"></strong> kN</div>
+                <div class="res-line">Eficiencia del Grupo (ηe): <strong id="r_eficiencia"></strong> %</div>
+            </div>
+
+            <h3 style="margin-top: 30px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Asentamiento Elástico</h3>
+            <div class="res-line">Asentamiento por acortamiento del pilote (ρp): <strong id="r_rho_p"></strong> mm</div>
+            <div class="res-line">Asentamiento por fricción en el fuste (ρes): <strong id="r_rho_es"></strong> mm</div>
+            <div class="res-line">Asentamiento en la base (ρb): <strong id="r_rho_b"></strong> mm</div>
+            <br>
+            <div class="res-line"><strong>Asentamiento Elástico Total: <span id="r_asentamiento"></span> mm</strong></div>
+
+            <h3 style="margin-top: 30px;">Detalle de Fricción por Estrato</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Estrato</th>
+                            <th>φ (°)</th>
+                            <th>Ko</th>
+                            <th>Área (m²)</th>
+                            <th>Qf (kN)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-friccion">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('btnComenzar').addEventListener('click', () => {
+            const pantallaInicio = document.getElementById('pantalla-inicio');
+            pantallaInicio.style.opacity = '0';
+            
+            setTimeout(() => {
+                pantallaInicio.style.visibility = 'hidden';
+                document.getElementById('app-principal').style.display = 'block';
+                actualizarCamposForma();
+                document.getElementById('btnGenerar').click();
+            }, 500);
+        });
+
+        function actualizarCamposForma() {
+            const forma = document.getElementById('forma_pilote').value;
+            const div = document.getElementById('contenedor-dimensiones');
+            
+            if(forma === 'circular') {
+                div.innerHTML = `<div class="form-group"><label>Diámetro (D) [m]</label><input type="number" id="dim_d" step="0.01" required></div>`;
+            } else if(forma === 'cuadrada') {
+                div.innerHTML = `
+                    <div class="form-group"><label>Lado (B) [m]</label><input type="number" id="dim_b" step="0.01" required></div>
+                `;
+            } else {
+                div.innerHTML = `
+                    <div class="form-group"><label>Ancho (B) [m]</label><input type="number" id="dim_b" step="0.01" required></div>
+                    <div class="form-group"><label>Largo (L) [m]</label><input type="number" id="dim_l" step="0.01" required></div>
+                `;
+            }
+        }
+
+        document.getElementById('btnGenerar').addEventListener('click', () => {
+            const num = parseInt(document.getElementById('num_estratos').value);
+            const container = document.getElementById('estratos-container');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= num; i++) {
+                const html = `
+                <div class="estrato-box">
+                    <h3>Estrato ${i}</h3>
+                    <div class="estrato-grid">
+                        <div class="form-group"><label>Tipo (CL-CH / GW-SP)</label><select class="e_tipo"><option value="cohesivo">Cohesivo</option><option value="granular">Granular</option></select></div>
+                        <div class="form-group"><label>Espesor H (m)</label><input type="number" class="e_h" step="0.01" required></div>
+                        <div class="form-group"><label>γ sat (kN/m³)</label><input type="number" class="e_gamma_sat" step="0.01" value="0"></div>
+                        <div class="form-group"><label>γ w (kN/m³)</label><input type="number" class="e_gamma_w" step="0.01" value="9.81"></div>
+                        <div class="form-group"><label>γ d (kN/m³)</label><input type="number" class="e_gamma_d" step="0.01" required></div>
+                        <div class="form-group"><label>OCR</label><input type="number" class="e_ocr" step="0.01" value="1.0"></div>
+                        <div class="form-group"><label>Phi (φ°)</label><input type="number" class="e_phi" step="0.01" value="0"></div>
+                        <div class="form-group"><label>Su (kPa)</label><input type="number" class="e_su" step="0.01" value="0"></div>
+                        <div class="form-group"><label>Módulo E (kPa)</label><input type="number" class="e_mod_e" step="0.01" value="0"></div>
+                        <div class="form-group"><label>Poisson (v)</label><input type="number" class="e_poisson" step="0.01" value="0"></div>
+                    </div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', html);
+            }
+        });
+
+        document.getElementById('calcForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const material = document.getElementById('material').value;
+            const tipo_pilote = document.getElementById('tipo_pilote').value;
+            const forma_pilote = document.getElementById('forma_pilote').value;
+            const fs_value = document.getElementById('fs').value;
+            const longitud = document.getElementById('longitud').value;
+            
+            const grupo_nx = document.getElementById('grupo_nx').value;
+            const grupo_ny = document.getElementById('grupo_ny').value;
+            const grupo_s = document.getElementById('grupo_s').value;
+            
+            const dim_d = document.getElementById('dim_d') ? document.getElementById('dim_d').value : 0;
+            const dim_b = document.getElementById('dim_b') ? document.getElementById('dim_b').value : 0;
+            const dim_l = document.getElementById('dim_l') ? document.getElementById('dim_l').value : 0;
+            
+            const estratosData = [];
+            const estratosBoxes = document.querySelectorAll('.estrato-box');
+
+            estratosBoxes.forEach(box => {
+                estratosData.push({
+                    tipo: box.querySelector('.e_tipo').value,
+                    h: box.querySelector('.e_h').value,
+                    gamma_sat: box.querySelector('.e_gamma_sat').value,
+                    gamma_w: box.querySelector('.e_gamma_w').value,
+                    gamma_d: box.querySelector('.e_gamma_d').value,
+                    ocr: box.querySelector('.e_ocr').value,
+                    phi: box.querySelector('.e_phi').value,
+                    su: box.querySelector('.e_su').value,
+                    mod_e: box.querySelector('.e_mod_e').value,
+                    poisson: box.querySelector('.e_poisson').value
+                });
+            });
+
+            const payload = {
+                material: material,
+                tipo_pilote: tipo_pilote,
+                forma: forma_pilote,
+                longitud: longitud,
+                fs: fs_value,
+                grupo_nx: grupo_nx,
+                grupo_ny: grupo_ny,
+                grupo_s: grupo_s,
+                dim_d: dim_d,
+                dim_b: dim_b,
+                dim_l: dim_l,
+                estratos: estratosData
+            };
+
+            const res = await fetch('/calcular', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+            
+            document.getElementById('r_qs_pos').textContent = data.qs_pos.toFixed(2);
+            document.getElementById('r_qs_neg').textContent = data.qs_neg.toFixed(2);
+            document.getElementById('r_qb').textContent = data.qb.toFixed(2);
+            document.getElementById('r_peso').textContent = data.peso.toFixed(2);
+            document.getElementById('r_qu').textContent = data.qu.toFixed(2);
+            document.getElementById('r_qadm').textContent = data.qadm.toFixed(2);
+            
+            document.getElementById('r_rho_p').textContent = data.rho_p.toFixed(3);
+            document.getElementById('r_rho_es').textContent = data.rho_es.toFixed(3);
+            document.getElementById('r_rho_b').textContent = data.rho_b.toFixed(3);
+            document.getElementById('r_asentamiento').textContent = data.asentamiento_mm.toFixed(3);
+            
+            if(data.n_pilotes > 1) {
+                document.getElementById('seccion_grupo').style.display = 'block';
+                document.getElementById('r_qu_single_total').textContent = data.qu_single_total.toFixed(2);
+                document.getElementById('r_qu_bloque').textContent = data.qu_bloque.toFixed(2);
+                document.getElementById('r_qu_grupo').textContent = data.qu_grupo.toFixed(2);
+                document.getElementById('r_eficiencia').textContent = data.eficiencia.toFixed(1);
+            } else {
+                document.getElementById('seccion_grupo').style.display = 'none';
+            }
+            
+            const tabla = document.getElementById('tabla-friccion');
+            tabla.innerHTML = '';
+            data.detalles_friccion.forEach(detalle => {
+                const ko_text = detalle.ko !== null ? detalle.ko.toFixed(2) : 'Alfa';
+                tabla.innerHTML += `
+                    <tr>
+                        <td>Estrato ${detalle.estrato}</td>
+                        <td>${detalle.phi.toFixed(1)}</td>
+                        <td>${ko_text}</td>
+                        <td>${detalle.area.toFixed(2)}</td>
+                        <td><strong>${detalle.qf.toFixed(2)}</strong></td>
+                    </tr>
+                `;
+            });
+            
+            const divRes = document.getElementById('resultados');
+            divRes.style.display = 'block';
+            window.scrollTo({top: divRes.offsetTop, behavior: 'smooth'});
+        });
+    </script>
+</body>
+</html>
