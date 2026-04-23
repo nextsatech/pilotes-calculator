@@ -13,78 +13,68 @@
             padding: 0; 
         }
         
+        /* =========================================
+           ESTILOS DEL SLIDER DE INICIO (PORTADA)
+           ========================================= */
         #pantalla-inicio {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(15, 32, 39, 0.85), rgba(32, 58, 67, 0.85), rgba(44, 83, 100, 0.85)),
-                        url('https://www.zuloaga.online/cimientosprofundos/wp-content/uploads/sites/11/2024/02/Pilotes-de-Desplazamiento.webp') center/cover no-repeat;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             z-index: 1000;
-            transition: opacity 0.5s ease, visibility 0.5s;
+            background-color: #111;
+            transition: opacity 0.8s ease-in-out, visibility 0.8s;
         }
 
-        .presentacion-card {
-            background: #ffffff;
-            padding: 60px 50px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-            max-width: 600px;
-            width: 90%;
+        .slide {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            /* 'contain' evita que la imagen se recorte, 'cover' llena la pantalla. 
+               Usamos 'contain' asumiendo que son infografías con texto importante */
+            background-size: contain; 
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: #111;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
         }
 
-        .presentacion-card h1 {
-            margin: 0 0 15px 0;
-            font-size: 32px;
-            color: #1a1a1a;
-            letter-spacing: -0.5px;
+        .slide.active {
+            opacity: 1;
+            z-index: 2;
         }
 
-        .linea-separadora {
-            width: 60px;
-            height: 4px;
-            background-color: #0066cc;
-            margin: 0 auto 30px auto;
-            border-radius: 2px;
+        /* Rutas hacia la carpeta estática de Flask */
+        .slide-portada { background-image: url('/static/portada.jpeg'); }
+        .slide-1 { background-image: url('/static/pilote.jpeg'); }
+        .slide-2 { background-image: url('/static/pilote2.jpeg'); }
+        .slide-3 { background-image: url('/static/pilote3.jpeg'); }
+
+        .slider-controls {
+            position: absolute;
+            bottom: 40px;
+            right: 50px;
+            z-index: 10;
         }
 
-        .presentacion-card .creditos {
+        /* Botón de aspecto limpio y tradicional (no generado por IA) */
+        .btn-siguiente {
+            background-color: #ffffff;
+            color: #333333;
+            border: 1px solid #cccccc;
+            padding: 12px 28px;
             font-size: 16px;
-            color: #444;
-            line-height: 1.8;
-            margin-bottom: 20px;
-        }
-
-        .presentacion-card .subtitulo {
-            font-size: 13px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 40px;
-            font-weight: 600;
-        }
-
-        .btn-comenzar {
-            background-color: #0066cc;
-            color: #fff;
-            border: none;
-            padding: 16px 36px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 8px;
+            font-family: inherit;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        .btn-comenzar:hover {
-            background-color: #0055b3;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
+        .btn-siguiente:hover {
+            background-color: #f5f5f5;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
+       
         #app-principal {
             display: none; 
             max-width: 950px;
@@ -94,9 +84,7 @@
             border: 1px solid #ccc;
             border-radius: 8px;
         }
-        h1, h2, h3 {
-            color: #333;
-        }
+        h1, h2, h3 { color: #333; }
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -108,14 +96,8 @@
             grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
             gap: 10px;
         }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
-        label {
-            margin-bottom: 5px;
-            font-size: 14px;
-        }
+        .form-group { display: flex; flex-direction: column; }
+        label { margin-bottom: 5px; font-size: 14px; }
         input, select {
             padding: 8px;
             border: 1px solid #ccc;
@@ -129,6 +111,10 @@
             background: #fafafa;
             border-radius: 6px;
         }
+        .estrato-cons-box {
+            background-color: #f4f7fa; 
+            border-color: #e2e8f0;
+        }
         .btn-accion {
             background-color: #444;
             color: #fff;
@@ -139,9 +125,7 @@
             margin-top: 10px;
             border-radius: 4px;
         }
-        .btn-accion:hover {
-            background-color: #222;
-        }
+        .btn-accion:hover { background-color: #222; }
         #resultados {
             margin-top: 30px;
             padding-top: 20px;
@@ -152,9 +136,7 @@
             font-size: 15px;
             margin-bottom: 8px;
         }
-        .friccion-neg {
-            color: #d9534f;
-        }
+        .friccion-neg { color: #d9534f; }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -166,9 +148,7 @@
             text-align: left;
             font-size: 14px;
         }
-        th {
-            background-color: #eee;
-        }
+        th { background-color: #eee; }
         .grupo-section {
             background: #fdfdfd;
             border: 1px dashed #bbb;
@@ -176,20 +156,49 @@
             margin-bottom: 20px;
             border-radius: 6px;
         }
+        
+        /* Contenedor para las imágenes de los estratos individuales */
+        .contenedor-imagenes-estratos {
+            display: flex; 
+            gap: 20px; 
+            margin-top: 25px; 
+            margin-bottom: 40px;
+            flex-wrap: wrap; 
+            justify-content: center;
+        }
+        .carta-estrato {
+            text-align: center;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #eaeaea;
+        }
+        .contenedor-imagenes-estratos img {
+            width: 100%;
+            max-width: 220px;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+        .titulo-estrato {
+            margin-top: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #555;
+        }
     </style>
 </head>
 <body>
 
     <div id="pantalla-inicio">
-        <div class="presentacion-card">
-            <h1>Diseño de Cimentaciones Profundas</h1>
-            <div class="linea-separadora"></div>
-            <p class="creditos">
-                Desarrollado por:<br>
-                <strong>Andrés Romero | Lorenzo Romero | Johan Orozco</strong>
-            </p>
-            <p class="subtitulo">Con fines educativos • Geotecnia II</p>
-            <button id="btnComenzar" class="btn-comenzar">Comenzar Cálculo</button>
+        <div class="slide slide-portada active"></div>
+        <div class="slide slide-1"></div>
+        <div class="slide slide-2"></div>
+        <div class="slide slide-3"></div>
+        
+        <div class="slider-controls">
+            <button id="btnSiguiente" class="btn-siguiente">Siguiente ➔</button>
         </div>
     </div>
 
@@ -235,37 +244,58 @@
                 </div>
             </div>
 
+            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                <label style="margin: 0; font-weight: bold;">N° Estratos (Suelo General):</label>
+                <input type="number" id="num_estratos" value="1" min="1" max="5" style="width: 60px;">
+                <button type="button" id="btnGenerar" class="btn-accion" style="margin: 0;">Generar Estratos</button>
+            </div>
+            <div id="estratos-container"></div>
+
             <div class="grupo-section">
                 <h3 style="margin-top:0; color:#444;">Configuración de Grupo de Pilotes</h3>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>N° Pilotes en X</label>
-                        <input type="number" id="grupo_nx" step="1" value="1" min="1" required>
+                        <label>N° Pilotes en el Grupo (n)</label>
+                        <input type="number" id="n_pilotes" step="1" value="1" min="1" required>
                     </div>
                     <div class="form-group">
-                        <label>N° Pilotes en Y</label>
-                        <input type="number" id="grupo_ny" step="1" value="1" min="1" required>
+                        <label>Perímetro del Grupo (Pg) [m]</label>
+                        <input type="number" id="perimetro_g" step="0.01" value="0" required>
                     </div>
                     <div class="form-group">
-                        <label>Espaciamiento S [m]</label>
-                        <input type="number" id="grupo_s" step="0.01" value="0" required>
+                        <label>Área del Grupo (Ag) [m²]</label>
+                        <input type="number" id="area_g" step="0.01" value="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Peso Total del Grupo [kN]</label>
+                        <input type="number" id="peso_g" step="0.01" value="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Base del Grupo (B) [m]</label>
+                        <input type="number" id="bg_g" step="0.01" value="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Lado Largo del Grupo (Lg) [m]</label>
+                        <input type="number" id="lg_g" step="0.01" value="0" required>
                     </div>
                 </div>
             </div>
 
-            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                <label style="margin: 0; font-weight: bold;">N° Estratos:</label>
-                <input type="number" id="num_estratos" value="1" min="1" max="5" style="width: 60px;">
-                <button type="button" id="btnGenerar" class="btn-accion" style="margin: 0;">Generar Estratos</button>
+            <div class="grupo-section">
+                <h3 style="margin-top:0; color:#444;">Estratos Consolidables</h3>
+                <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <label style="margin: 0; font-weight: bold;">N° Estratos Cohesivos:</label>
+                    <input type="number" id="num_estratos_cons" value="0" min="0" max="5" style="width: 60px;">
+                    <button type="button" id="btnGenerarCons" class="btn-accion" style="margin: 0; background-color: #555;">Generar</button>
+                </div>
+                <div id="estratos-cons-container"></div>
             </div>
-
-            <div id="estratos-container"></div>
 
             <button type="submit" class="btn-accion" style="width: 100%; padding: 15px; font-size: 16px; margin-top: 20px;">Ejecutar Cálculo Final</button>
         </form>
 
         <div id="resultados">
-            <h2>Resultados del Análisis</h2>
+            <h2>Resultados del Análisis (Pilote Individual)</h2>
             <div class="res-line">Resistencia por fuste (Σ Qf): <strong id="r_qs_pos"></strong> kN</div>
             <div class="res-line friccion-neg">Fricción Negativa Estimada (Info): <strong id="r_qs_neg"></strong> kN</div>
             <div class="res-line">Resistencia por punta (Qb): <strong id="r_qb"></strong> kN</div>
@@ -274,20 +304,44 @@
             <div class="res-line">Capacidad Última Neta (Qu = Σ Qf + Qb - Wp): <strong id="r_qu"></strong> kN</div>
             <div class="res-line">Carga Admisible (Qadm = Qu / FS): <strong id="r_qadm"></strong> kN</div>
 
-            <div id="seccion_grupo" style="display:none; margin-top: 30px;">
-                <h3 style="border-bottom: 1px solid #ccc; padding-bottom: 5px;">Análisis de Grupo de Pilotes</h3>
-                <div class="res-line">Capacidad Falla Individual (n × Qu): <strong id="r_qu_single_total"></strong> kN</div>
-                <div class="res-line">Capacidad Falla por Bloque (Qub_gb): <strong id="r_qu_bloque"></strong> kN</div>
-                <div class="res-line">Capacidad Última del Grupo: <strong id="r_qu_grupo"></strong> kN</div>
-                <div class="res-line">Eficiencia del Grupo (ηe): <strong id="r_eficiencia"></strong> %</div>
-            </div>
-
-            <h3 style="margin-top: 30px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Asentamiento Elástico</h3>
+            <h3 style="margin-top: 30px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Desglose de Asentamiento Elástico Individual</h3>
             <div class="res-line">Asentamiento por acortamiento del pilote (ρp): <strong id="r_rho_p"></strong> mm</div>
+            <div id="lista_rho_p" style="margin-left: 20px; margin-bottom: 10px; font-size: 14px; color: #555;"></div>
+            
             <div class="res-line">Asentamiento por fricción en el fuste (ρes): <strong id="r_rho_es"></strong> mm</div>
+            <div id="lista_rho_es" style="margin-left: 20px; margin-bottom: 10px; font-size: 14px; color: #555;"></div>
+            
             <div class="res-line">Asentamiento en la base (ρb): <strong id="r_rho_b"></strong> mm</div>
             <br>
             <div class="res-line"><strong>Asentamiento Elástico Total: <span id="r_asentamiento"></span> mm</strong></div>
+
+            <div id="imagenes_estratos_dinamicas" class="contenedor-imagenes-estratos"></div>
+
+            <div id="seccion_grupo" style="display:none; margin-top: 40px;">
+                <h2 style="border-bottom: 2px solid #ccc; padding-bottom: 5px;">Análisis de Grupo de Pilotes</h2>
+                <div class="res-line">Resistencia por fuste del bloque (Σ Qf_bloque): <strong id="r_qs_bloque"></strong> kN</div>
+                <div class="res-line">Resistencia por punta del bloque (Qb_bloque): <strong id="r_qb_bloque"></strong> kN</div>
+                <div class="res-line">Peso del bloque (W_bloque): <strong id="r_peso_bloque"></strong> kN</div>
+                <div class="res-line">Capacidad Falla por Bloque (Qub_gb): <strong id="r_qu_bloque"></strong> kN</div>
+                <br>
+                <div class="res-line">Carga Admisible del Grupo (Qadm_grupo): <strong id="r_qadm_grupo"></strong> kN</div>
+                <div class="res-line">Eficiencia del Grupo [N = Qadm_grupo / (n × Qadm_ind)]: <strong id="r_eficiencia"></strong></div>
+                
+                <h3 style="margin-top: 30px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Desglose de Asentamiento Elástico del Grupo</h3>
+                <div class="res-line">Asentamiento por acortamiento del bloque (ρp_grupo): <strong id="r_rho_p_g"></strong> mm</div>
+                <div id="lista_rho_p_g" style="margin-left: 20px; margin-bottom: 10px; font-size: 14px; color: #555;"></div>
+                
+                <div class="res-line">Asentamiento por fricción del bloque (ρes_grupo): <strong id="r_rho_es_g"></strong> mm</div>
+                <div id="lista_rho_es_g" style="margin-left: 20px; margin-bottom: 10px; font-size: 14px; color: #555;"></div>
+                
+                <div class="res-line">Asentamiento en la base del bloque (ρb_grupo): <strong id="r_rho_b_g"></strong> mm</div>
+                <br>
+                <div class="res-line"><strong>Asentamiento Elástico Total del Grupo: <span id="r_asentamiento_g"></span> mm</strong></div>
+
+                <h3 style="margin-top: 30px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">Asentamiento por Consolidación del Grupo</h3>
+                <div id="lista_rho_cons" style="margin-left: 20px; margin-bottom: 10px; font-size: 14px; color: #555;"></div>
+                <div class="res-line"><strong>Asentamiento por Consolidación Total: <span id="r_asentamiento_cons_total"></span> mm</strong></div>
+            </div>
 
             <h3 style="margin-top: 30px;">Detalle de Fricción por Estrato</h3>
             <div style="overflow-x: auto;">
@@ -297,6 +351,7 @@
                             <th>Estrato</th>
                             <th>φ (°)</th>
                             <th>Ko</th>
+                            <th>σ'z (kPa)</th>
                             <th>Área (m²)</th>
                             <th>Qf (kN)</th>
                         </tr>
@@ -309,18 +364,39 @@
     </div>
 
     <script>
-        document.getElementById('btnComenzar').addEventListener('click', () => {
-            const pantallaInicio = document.getElementById('pantalla-inicio');
-            pantallaInicio.style.opacity = '0';
+        // LÓGICA DEL SLIDER
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const btnSiguiente = document.getElementById('btnSiguiente');
+        const pantallaInicio = document.getElementById('pantalla-inicio');
+
+        btnSiguiente.addEventListener('click', () => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide++;
             
-            setTimeout(() => {
-                pantallaInicio.style.visibility = 'hidden';
-                document.getElementById('app-principal').style.display = 'block';
-                actualizarCamposForma();
-                document.getElementById('btnGenerar').click();
-            }, 500);
+            if (currentSlide < slides.length) {
+                slides[currentSlide].classList.add('active');
+                
+                // Si es la última diapositiva, el botón invita a iniciar la app
+                if (currentSlide === slides.length - 1) {
+                    btnSiguiente.textContent = 'Comenzar Cálculo';
+                    btnSiguiente.style.backgroundColor = '#0056b3';
+                    btnSiguiente.style.color = '#ffffff';
+                    btnSiguiente.style.borderColor = '#004494';
+                }
+            } else {
+                // Ocultar pantalla de inicio suavemente
+                pantallaInicio.style.opacity = '0';
+                setTimeout(() => {
+                    pantallaInicio.style.visibility = 'hidden';
+                    document.getElementById('app-principal').style.display = 'block';
+                    actualizarCamposForma();
+                    document.getElementById('btnGenerar').click();
+                }, 600);
+            }
         });
 
+        // LÓGICA DEL FORMULARIO Y CÁLCULOS
         function actualizarCamposForma() {
             const forma = document.getElementById('forma_pilote').value;
             const div = document.getElementById('contenedor-dimensiones');
@@ -365,6 +441,30 @@
             }
         });
 
+        document.getElementById('btnGenerarCons').addEventListener('click', () => {
+            const num = parseInt(document.getElementById('num_estratos_cons').value);
+            const container = document.getElementById('estratos-cons-container');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= num; i++) {
+                const html = `
+                <div class="estrato-box estrato-cons-box">
+                    <h4>Capa Consolidable ${i}</h4>
+                    <div class="estrato-grid">
+                        <div class="form-group"><label>Espesor H (m)</label><input type="number" class="ec_h" step="0.01" required></div>
+                        <div class="form-group"><label>Z (m)</label><input type="number" class="ec_z" step="0.01" required></div>
+                        <div class="form-group"><label>Cc</label><input type="number" class="ec_cc" step="0.001" required></div>
+                        <div class="form-group"><label>Cs</label><input type="number" class="ec_cs" step="0.001" required></div>
+                        <div class="form-group"><label>e (vacíos)</label><input type="number" class="ec_e" step="0.01" required></div>
+                        <div class="form-group"><label>OCR</label><input type="number" class="ec_ocr" step="0.01" value="1.0" required></div>
+                        <div class="form-group"><label>σ'0 (kPa)</label><input type="number" class="ec_sigma0" step="0.01" required></div>
+                        <div class="form-group"><label>σ'c (kPa)</label><input type="number" class="ec_sigmac" step="0.01" required></div>
+                    </div>
+                </div>`;
+                container.insertAdjacentHTML('beforeend', html);
+            }
+        });
+
         document.getElementById('calcForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -374,18 +474,19 @@
             const fs_value = document.getElementById('fs').value;
             const longitud = document.getElementById('longitud').value;
             
-            const grupo_nx = document.getElementById('grupo_nx').value;
-            const grupo_ny = document.getElementById('grupo_ny').value;
-            const grupo_s = document.getElementById('grupo_s').value;
+            const n_pilotes = document.getElementById('n_pilotes').value;
+            const perimetro_g = document.getElementById('perimetro_g').value;
+            const area_g = document.getElementById('area_g').value;
+            const peso_g = document.getElementById('peso_g').value;
+            const bg_g = document.getElementById('bg_g').value;
+            const lg_g = document.getElementById('lg_g').value;
             
             const dim_d = document.getElementById('dim_d') ? document.getElementById('dim_d').value : 0;
             const dim_b = document.getElementById('dim_b') ? document.getElementById('dim_b').value : 0;
             const dim_l = document.getElementById('dim_l') ? document.getElementById('dim_l').value : 0;
             
             const estratosData = [];
-            const estratosBoxes = document.querySelectorAll('.estrato-box');
-
-            estratosBoxes.forEach(box => {
+            document.querySelectorAll('#estratos-container .estrato-box').forEach(box => {
                 estratosData.push({
                     tipo: box.querySelector('.e_tipo').value,
                     h: box.querySelector('.e_h').value,
@@ -400,19 +501,37 @@
                 });
             });
 
+            const estratosConsData = [];
+            document.querySelectorAll('.estrato-cons-box').forEach(box => {
+                estratosConsData.push({
+                    h: box.querySelector('.ec_h').value,
+                    z: box.querySelector('.ec_z').value,
+                    cc: box.querySelector('.ec_cc').value,
+                    cs: box.querySelector('.ec_cs').value,
+                    e: box.querySelector('.ec_e').value,
+                    ocr: box.querySelector('.ec_ocr').value,
+                    sigma0: box.querySelector('.ec_sigma0').value,
+                    sigmac: box.querySelector('.ec_sigmac').value
+                });
+            });
+
             const payload = {
                 material: material,
                 tipo_pilote: tipo_pilote,
                 forma: forma_pilote,
                 longitud: longitud,
                 fs: fs_value,
-                grupo_nx: grupo_nx,
-                grupo_ny: grupo_ny,
-                grupo_s: grupo_s,
+                n_pilotes: n_pilotes,
+                perimetro_g: perimetro_g,
+                area_g: area_g,
+                peso_g: peso_g,
+                bg_g: bg_g,
+                lg_g: lg_g,
                 dim_d: dim_d,
                 dim_b: dim_b,
                 dim_l: dim_l,
-                estratos: estratosData
+                estratos: estratosData,
+                estratos_cons: estratosConsData
             };
 
             const res = await fetch('/calcular', {
@@ -430,17 +549,78 @@
             document.getElementById('r_qu').textContent = data.qu.toFixed(2);
             document.getElementById('r_qadm').textContent = data.qadm.toFixed(2);
             
-            document.getElementById('r_rho_p').textContent = data.rho_p.toFixed(3);
-            document.getElementById('r_rho_es').textContent = data.rho_es.toFixed(3);
-            document.getElementById('r_rho_b').textContent = data.rho_b.toFixed(3);
-            document.getElementById('r_asentamiento').textContent = data.asentamiento_mm.toFixed(3);
-            
+            document.getElementById('r_rho_p').textContent = data.rho_p.toFixed(4);
+            const listaRhoP = document.getElementById('lista_rho_p');
+            listaRhoP.innerHTML = '';
+            data.detalles_asentamiento.forEach(d => {
+                if(d.rho_p_mm > 0) {
+                    listaRhoP.innerHTML += `<div>- Estrato ${d.estrato}: ${d.rho_p_mm.toFixed(4)} mm</div>`;
+                }
+            });
+
+            document.getElementById('r_rho_es').textContent = data.rho_es.toFixed(4);
+            const listaRhoEs = document.getElementById('lista_rho_es');
+            listaRhoEs.innerHTML = '';
+            data.detalles_asentamiento.forEach(d => {
+                if(d.rho_es_mm > 0) {
+                    listaRhoEs.innerHTML += `<div>- Estrato ${d.estrato}: ${d.rho_es_mm.toFixed(4)} mm</div>`;
+                }
+            });
+
+            document.getElementById('r_rho_b').textContent = data.rho_b.toFixed(4);
+            document.getElementById('r_asentamiento').textContent = data.asentamiento_mm.toFixed(4);
+
+            // INYECCIÓN DINÁMICA DE IMÁGENES DE ESTRATOS
+            // Aparecen justo después del análisis individual y antes del de grupo
+            const divImgs = document.getElementById('imagenes_estratos_dinamicas');
+            divImgs.innerHTML = '';
+            const totalEstratos = data.detalles_friccion.length; 
+            for(let i = 1; i <= Math.min(totalEstratos, 6); i++) {
+                divImgs.innerHTML += `
+                    <div class="carta-estrato">
+                        <img src="/static/estrato_${i}.jpeg" alt="Estrato ${i}" onerror="this.style.display='none'">
+                        <div class="titulo-estrato">Estrato ${i}</div>
+                    </div>
+                `;
+            }
+
             if(data.n_pilotes > 1) {
                 document.getElementById('seccion_grupo').style.display = 'block';
-                document.getElementById('r_qu_single_total').textContent = data.qu_single_total.toFixed(2);
+                document.getElementById('r_qs_bloque').textContent = data.qs_bloque.toFixed(2);
+                document.getElementById('r_qb_bloque').textContent = data.qb_bloque.toFixed(2);
+                document.getElementById('r_peso_bloque').textContent = data.peso_bloque.toFixed(2);
                 document.getElementById('r_qu_bloque').textContent = data.qu_bloque.toFixed(2);
-                document.getElementById('r_qu_grupo').textContent = data.qu_grupo.toFixed(2);
-                document.getElementById('r_eficiencia').textContent = data.eficiencia.toFixed(1);
+                document.getElementById('r_qadm_grupo').textContent = data.qadm_grupo.toFixed(2);
+                document.getElementById('r_eficiencia').textContent = data.eficiencia.toFixed(2);
+                
+                document.getElementById('r_rho_p_g').textContent = data.rho_p_g.toFixed(4);
+                const listaRhoPg = document.getElementById('lista_rho_p_g');
+                listaRhoPg.innerHTML = '';
+                data.detalles_asentamiento_g.forEach(d => {
+                    if(d.rho_p_mm > 0) {
+                        listaRhoPg.innerHTML += `<div>- Estrato ${d.estrato}: ${d.rho_p_mm.toFixed(4)} mm</div>`;
+                    }
+                });
+
+                document.getElementById('r_rho_es_g').textContent = data.rho_es_g.toFixed(4);
+                const listaRhoEsg = document.getElementById('lista_rho_es_g');
+                listaRhoEsg.innerHTML = '';
+                data.detalles_asentamiento_g.forEach(d => {
+                    if(d.rho_es_mm > 0) {
+                        listaRhoEsg.innerHTML += `<div>- Estrato ${d.estrato}: ${d.rho_es_mm.toFixed(4)} mm</div>`;
+                    }
+                });
+
+                document.getElementById('r_rho_b_g').textContent = data.rho_b_g.toFixed(4);
+                document.getElementById('r_asentamiento_g').textContent = data.asentamiento_g_mm.toFixed(4);
+
+                document.getElementById('r_asentamiento_cons_total').textContent = data.asentamiento_cons_mm.toFixed(4);
+                const listaRhoCons = document.getElementById('lista_rho_cons');
+                listaRhoCons.innerHTML = '';
+                data.detalles_cons.forEach(d => {
+                    listaRhoCons.innerHTML += `<div>- Capa ${d.estrato}: Δσz = ${d.delta_sigma.toFixed(2)} kPa, Sc = ${d.sc_mm.toFixed(4)} mm</div>`;
+                });
+
             } else {
                 document.getElementById('seccion_grupo').style.display = 'none';
             }
@@ -448,12 +628,13 @@
             const tabla = document.getElementById('tabla-friccion');
             tabla.innerHTML = '';
             data.detalles_friccion.forEach(detalle => {
-                const ko_text = detalle.ko !== null ? detalle.ko.toFixed(2) : 'Alfa';
+                const ko_text = detalle.ko !== null ? detalle.ko.toFixed(3) : 'Alfa';
                 tabla.innerHTML += `
                     <tr>
                         <td>Estrato ${detalle.estrato}</td>
                         <td>${detalle.phi.toFixed(1)}</td>
                         <td>${ko_text}</td>
+                        <td>${detalle.esfuerzo_v.toFixed(2)}</td>
                         <td>${detalle.area.toFixed(2)}</td>
                         <td><strong>${detalle.qf.toFixed(2)}</strong></td>
                     </tr>

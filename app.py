@@ -17,10 +17,12 @@ def calcular():
     fs_global = float(data.get('fs', 3.0))
     material = data.get('material', 'concreto')
     
-    nx = int(data.get('grupo_nx', 1))
-    ny = int(data.get('grupo_ny', 1))
-    s_espacio = float(data.get('grupo_s', 0))
-    n_pilotes = nx * ny
+    n_pilotes = int(data.get('n_pilotes', 1))
+    perimetro_g = float(data.get('perimetro_g', 0))
+    area_g = float(data.get('area_g', 0))
+    peso_g_input = float(data.get('peso_g', 0))
+    bg_g = float(data.get('bg_g', 0))
+    lg_g = float(data.get('lg_g', 0))
     
     if forma == 'circular':
         d = float(data.get('dim_d', 0))
@@ -39,11 +41,8 @@ def calcular():
         area = b * l_rect
         d_eq = math.sqrt(4.0 * area / math.pi)
         
-    bg = (nx - 1) * s_espacio + d_eq
-    lg = (ny - 1) * s_espacio + d_eq
-    perimetro_g = 2.0 * (bg + lg)
-    area_g = bg * lg
-    
+    d_eq_g = math.sqrt(4.0 * area_g / math.pi) if area_g > 0 else 0
+
     if material == 'concreto':
         gamma_p = 24.0
         e_p = 21000000.0 
@@ -60,6 +59,11 @@ def calcular():
     peso = area * l * gamma_p
     
     estratos = data.get('estratos', [])
+    estratos_cons = data.get('estratos_cons', [])
+    
+    c_factor = 0.5
+    if len(estratos) > 0 and estratos[0].get('tipo', 'cohesivo') == 'cohesivo' and float(estratos[0].get('ocr', 1.0)) <= 1.0:
+        c_factor = 0.7
     
     for i, estrato in enumerate(estratos):
         tipo = estrato.get('tipo', 'cohesivo')
@@ -81,12 +85,15 @@ def calcular():
     qs_positivo = 0.0
     qs_negativo = 0.0
     qs_bloque_pos = 0.0
-    peso_bloque = 0.0
-    esfuerzos_efectivos = []
-    detalles_friccion = []
     
-    suma_e_h = 0.0
-    suma_h = 0.0
+    rho_p_total = 0.0
+    rho_es_total = 0.0
+    rho_p_g_total = 0.0
+    rho_es_g_total = 0.0
+    
+    detalles_friccion = []
+    detalles_asentamiento = []
+    detalles_asentamiento_g = []
     
     esfuerzo_tope_estrato = 0.0
     profundidad_techo = 0.0
@@ -112,9 +119,6 @@ def calcular():
         mod_e = float(estrato.get('mod_e', 0))
         h_negativo_total = estrato.get('h_negativo_total', 0.0)
         
-        gamma_total_estrato = gamma_sat if gamma_sat > 0 else gamma_d
-        peso_bloque += area_g * gamma_total_estrato * h_penetracion
-        
         if gamma_sat > 0:
             gamma_eff = gamma_sat - gamma_w
         else:
@@ -122,7 +126,6 @@ def calcular():
             
         z_medio = h_penetracion / 2.0
         esfuerzo_medio = esfuerzo_tope_estrato + (gamma_eff * z_medio)
-        esfuerzos_efectivos.append(esfuerzo_medio)
         
         fs_unit = 0.0
         ko_display = None
@@ -155,26 +158,66 @@ def calcular():
         
         qf_neg = fs_unit * perimetro * h_penetracion_negativa
         qf_pos = fs_unit * perimetro * h_penetracion_positiva
-        
         qs_negativo += qf_neg
         qs_positivo += qf_pos
-        qs_bloque_pos += fs_unit * perimetro_g * h_penetracion_positiva
+        
+        qf_bloque_pos_i = 0.0
+        if n_pilotes > 1:
+            qf_bloque_pos_i = fs_unit * perimetro_g * h_penetracion_positiva
+            qs_bloque_pos += qf_bloque_pos_i
+        
+        qf_adm_estrato = qf_pos / fs_global if fs_global > 0 else 0
+        qf_adm_bloque_estrato = qf_bloque_pos_i / fs_global if fs_global > 0 else 0
+        
+        rho_p_i = 0.0
+        rho_es_i = 0.0
+        rho_p_g_i = 0.0
+        rho_es_g_i = 0.0
+        
+        if h_penetracion_positiva > 0:
+            if e_p > 0 and area > 0:
+                rho_p_i = c_factor * (qf_adm_estrato * h_penetracion_positiva) / (e_p * area)
+            if mod_e > 0:
+                i_factor_i = 0.5 + math.log10(h_penetracion_positiva / d_eq) if d_eq > 0 else 1.0
+                rho_es_i = (qf_adm_estrato / (mod_e * h_penetracion_positiva)) * i_factor_i
+
+            if n_pilotes > 1:
+                if e_p > 0 and area_g > 0:
+                    rho_p_g_i = c_factor * (qf_adm_bloque_estrato * h_penetracion_positiva) / (e_p * area_g)
+                if mod_e > 0:
+                    i_factor_g = 0.5 + math.log10(h_penetracion_positiva / d_eq_g) if d_eq_g > 0 else 1.0
+                    rho_es_g_i = (qf_adm_bloque_estrato / (mod_e * h_penetracion_positiva)) * i_factor_g
+                
+        rho_p_total += rho_p_i
+        rho_es_total += rho_es_i
+        rho_p_g_total += rho_p_g_i
+        rho_es_g_total += rho_es_g_i
+
+        detalles_asentamiento.append({
+            "estrato": i + 1,
+            "rho_p_mm": rho_p_i * 1000.0,
+            "rho_es_mm": rho_es_i * 1000.0
+        })
+        
+        if n_pilotes > 1:
+            detalles_asentamiento_g.append({
+                "estrato": i + 1,
+                "rho_p_mm": rho_p_g_i * 1000.0,
+                "rho_es_mm": rho_es_g_i * 1000.0
+            })
         
         detalles_friccion.append({
             "estrato": i + 1,
             "phi": phi,
             "ko": ko_display,
+            "esfuerzo_v": esfuerzo_medio,
             "area": perimetro * h_penetracion_positiva,
             "qf": qf_pos
         })
         
         esfuerzo_punta = esfuerzo_tope_estrato + (gamma_eff * h_penetracion)
-        
         esfuerzo_tope_estrato += (gamma_eff * h_geologico)
         profundidad_techo += h_geologico
-        
-        suma_e_h += mod_e * h_penetracion
-        suma_h += h_penetracion
 
     qb = 0.0
     qb_bloque = 0.0
@@ -196,55 +239,91 @@ def calcular():
                 nq = nq * 0.5
             
             qb = nq * esfuerzo_punta * area 
-            qb_bloque = nq * esfuerzo_punta * area_g
+            if n_pilotes > 1:
+                qb_bloque = nq * esfuerzo_punta * area_g
         else:
             su_base = float(ultimo_estrato_tocado.get('su', 0))
             nc = 9.0
             qb = nc * su_base * area
-            qb_bloque = nc * su_base * area_g
+            if n_pilotes > 1:
+                qb_bloque = nc * su_base * area_g
 
     qu = qs_positivo + qb - peso
     qadm = qu / fs_global if fs_global > 0 else 0
 
-    qu_bloque_total = qs_bloque_pos + qb_bloque - peso_bloque
-    qu_single_total = qu * n_pilotes
+    qu_bloque_total = 0.0
+    qadm_grupo = 0.0
+    eficiencia = 1.0
     
     if n_pilotes > 1:
-        qu_grupo = min(qu_single_total, qu_bloque_total)
-        eficiencia = (qu_grupo / qu_single_total) * 100 if qu_single_total > 0 else 0
-    else:
-        qu_grupo = qu
-        qu_bloque_total = qu
-        eficiencia = 100.0
+        qu_bloque_total = qs_bloque_pos + qb_bloque - peso_g_input
+        qadm_grupo = qu_bloque_total / fs_global if fs_global > 0 else 0
+        qadm_ind_total = qadm * n_pilotes
+        eficiencia = (qadm_grupo / qadm_ind_total) if qadm_ind_total > 0 else 0
 
-    rho_p = 0.0
-    rho_es = 0.0
     rho_b = 0.0
-    asentamiento_total = 0.0
+    rho_b_g = 0.0
     if ultimo_estrato_tocado:
-        c_factor = 0.5
-        if estratos[0].get('tipo') == 'cohesivo' and float(estratos[0].get('ocr', 1)) <= 1.0:
-            c_factor = 0.7
-            
-        rho_p = c_factor * (qadm * l) / (e_p * area) if (e_p * area) > 0 else 0
-        
-        e_s0 = suma_e_h / suma_h if suma_h > 0 else 1.0
-        if e_s0 <= 0: e_s0 = 1.0
-            
-        q_af = qs_positivo / fs_global if fs_global > 0 else 0
-        i_factor = 0.5 + math.log10(l / d_eq) if d_eq > 0 else 1.0
-        rho_es = (q_af / (e_s0 * l)) * i_factor if l > 0 else 0.0
-        
         q_b_des = qb / fs_global if fs_global > 0 else 0
+        q_b_des_g = qb_bloque / fs_global if fs_global > 0 else 0
+        
         v_b = float(ultimo_estrato_tocado.get('poisson', 0))
         e_b = float(ultimo_estrato_tocado.get('mod_e', 0))
         if e_b <= 0: e_b = 1.0
             
         r_b = d_eq / 2.0
-        g_b = e_b / (2.0 * (1.0 + v_b))
-        rho_b = (q_b_des / (r_b * g_b)) * ((1.0 - v_b) / 4.0) if r_b > 0 and g_b > 0 else 0.0
+        r_b_g = d_eq_g / 2.0
+        g_b = e_b / (2.0 * (1.0 - v_b)) if v_b != 1.0 else e_b / 2.0
         
-        asentamiento_total = (rho_p + rho_es + rho_b) * 1000.0
+        if g_b > 0:
+            if r_b > 0:
+                rho_b = (q_b_des / (r_b * g_b)) * ((1.0 - v_b) / 4.0)
+            if n_pilotes > 1 and r_b_g > 0:
+                rho_b_g = (q_b_des_g / (r_b_g * g_b)) * ((1.0 - v_b) / 4.0)
+
+    asentamiento_total = (rho_p_total + rho_es_total + rho_b) * 1000.0
+    asentamiento_g_total = (rho_p_g_total + rho_es_g_total + rho_b_g) * 1000.0
+
+    detalles_cons = []
+    asentamiento_cons_total = 0.0
+
+    if n_pilotes > 1 and qadm_grupo > 0:
+        for i, estrato_c in enumerate(estratos_cons):
+            z_cons = float(estrato_c.get('z', 0))
+            h_cons = float(estrato_c.get('h', 0))
+            cc_cons = float(estrato_c.get('cc', 0))
+            cs_cons = float(estrato_c.get('cs', 0))
+            e_cons = float(estrato_c.get('e', 0))
+            ocr_cons = float(estrato_c.get('ocr', 1.0))
+            sigma0_cons = float(estrato_c.get('sigma0', 0))
+            sigmac_cons = float(estrato_c.get('sigmac', 0))
+            
+            delta_sigma = 0.0
+            if (bg_g + z_cons) > 0 and (lg_g + z_cons) > 0:
+                delta_sigma = qadm_grupo / ((bg_g + z_cons) * (lg_g + z_cons))
+                
+            sc_m = 0.0
+            if sigma0_cons > 0 and (1 + e_cons) > 0:
+                if ocr_cons == 1.0:
+                    sc_m = (cc_cons * h_cons / (1 + e_cons)) * math.log10((delta_sigma + sigma0_cons) / sigma0_cons)
+                elif ocr_cons > 1.0:
+                    if (delta_sigma + sigma0_cons) <= sigmac_cons:
+                        sc_m = (cs_cons * h_cons / (1 + e_cons)) * math.log10((delta_sigma + sigma0_cons) / sigma0_cons)
+                    else:
+                        sc_part1 = (cs_cons * h_cons / (1 + e_cons)) * math.log10(sigmac_cons / sigma0_cons) if sigmac_cons > 0 else 0
+                        sc_part2 = (cc_cons * h_cons / (1 + e_cons)) * math.log10((delta_sigma + sigma0_cons) / sigmac_cons) if sigmac_cons > 0 else 0
+                        sc_m = sc_part1 + sc_part2
+                else:
+                    sc_m = (cc_cons * h_cons / (1 + e_cons)) * math.log10((delta_sigma + sigma0_cons) / sigma0_cons)
+            
+            sc_mm = sc_m * 1000.0
+            asentamiento_cons_total += sc_mm
+            
+            detalles_cons.append({
+                "estrato": i + 1,
+                "delta_sigma": delta_sigma,
+                "sc_mm": sc_mm
+            })
 
     return jsonify({
         "qs_pos": qs_positivo,
@@ -253,16 +332,26 @@ def calcular():
         "peso": peso,
         "qu": qu,
         "qadm": qadm,
-        "rho_p": rho_p * 1000.0,
-        "rho_es": rho_es * 1000.0,
+        "rho_p": rho_p_total * 1000.0,
+        "rho_es": rho_es_total * 1000.0,
         "rho_b": rho_b * 1000.0,
         "asentamiento_mm": asentamiento_total,
         "n_pilotes": n_pilotes,
-        "qu_single_total": qu_single_total,
+        "qs_bloque": qs_bloque_pos,
+        "qb_bloque": qb_bloque,
+        "peso_bloque": peso_g_input,
         "qu_bloque": qu_bloque_total,
-        "qu_grupo": qu_grupo,
+        "qadm_grupo": qadm_grupo,
         "eficiencia": eficiencia,
-        "detalles_friccion": detalles_friccion
+        "rho_p_g": rho_p_g_total * 1000.0,
+        "rho_es_g": rho_es_g_total * 1000.0,
+        "rho_b_g": rho_b_g * 1000.0,
+        "asentamiento_g_mm": asentamiento_g_total,
+        "asentamiento_cons_mm": asentamiento_cons_total,
+        "detalles_friccion": detalles_friccion,
+        "detalles_asentamiento": detalles_asentamiento,
+        "detalles_asentamiento_g": detalles_asentamiento_g,
+        "detalles_cons": detalles_cons
     })
 
 if __name__ == '__main__':
