@@ -43,6 +43,7 @@ def calcular():
         
     d_eq_g = math.sqrt(4.0 * area_g / math.pi) if area_g > 0 else 0
 
+    # Ajuste de Delta factor pedido: Concreto 1.0, Madera 1.0, Metal 0.8
     if material == 'concreto':
         gamma_p = 24.0
         e_p = 21000000.0 
@@ -223,9 +224,9 @@ def calcular():
     qb_bloque = 0.0
     if ultimo_estrato_tocado:
         tipo_base = ultimo_estrato_tocado.get('tipo', 'cohesivo')
-        ocr_base = float(ultimo_estrato_tocado.get('ocr', 1.0))
         
-        if tipo_base == 'granular' or (tipo_base == 'cohesivo' and ocr_base > 1.0):
+        # Corrección vital: Punta en Cohesivo SIEMPRE usa Nc*Su independientemente del OCR
+        if tipo_base == 'granular':
             phi_base = float(ultimo_estrato_tocado.get('phi', 0))
             phi_rad = math.radians(phi_base)
             
@@ -241,7 +242,7 @@ def calcular():
             qb = nq * esfuerzo_punta * area 
             if n_pilotes > 1:
                 qb_bloque = nq * esfuerzo_punta * area_g
-        else:
+        else: # tipo_base == 'cohesivo'
             su_base = float(ultimo_estrato_tocado.get('su', 0))
             nc = 9.0
             qb = nc * su_base * area
