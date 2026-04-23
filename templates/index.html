@@ -72,9 +72,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
-        /* =========================================
-           RESTO DEL DISEÑO PRINCIPAL DE LA APP
-           ========================================= */
+        
         #app-principal {
             display: none; 
             max-width: 950px;
@@ -229,7 +227,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Longitud Total (L) [m]</label>
+                    <label>Altura del grupo (H) [m]</label>
                     <input type="number" id="longitud" step="0.01" required>
                 </div>
                 <div class="form-group">
@@ -272,6 +270,10 @@
                         <label>Lado Largo del Grupo (Lg) [m]</label>
                         <input type="number" id="lg_g" step="0.01" value="0" required>
                     </div>
+                    <div class="form-group">
+                        <label>Longitud del Grupo (Lg) [m]</label>
+                        <input type="number" id="longitud_g" step="0.01" value="0" required>
+                    </div>
                 </div>
             </div>
 
@@ -313,10 +315,10 @@
 
             <div id="seccion_grupo" style="display:none; margin-top: 40px;">
                 <h2 style="border-bottom: 2px solid #ccc; padding-bottom: 5px;">Análisis de Grupo de Pilotes</h2>
-                <div class="res-line">Resistencia por fuste (Σ Qf_g): <strong id="r_qs_bloque"></strong> kN</div>
-                <div class="res-line">Resistencia por punta (Qb_g): <strong id="r_qb_bloque"></strong> kN</div>
-                <div class="res-line">Peso (Wp_g): <strong id="r_peso_bloque"></strong> kN</div>
-                <div class="res-line">Capacidad Falla (Qu_gb): <strong id="r_qu_bloque"></strong> kN</div>
+                <div class="res-line">Resistencia por fuste del Grupo (Σ Qf_g): <strong id="r_qs_bloque"></strong> kN</div>
+                <div class="res-line">Resistencia por punta del Grupo (Qb_g): <strong id="r_qb_bloque"></strong> kN</div>
+                <div class="res-line">Peso del Grupo (W_g): <strong id="r_peso_bloque"></strong> kN</div>
+                <div class="res-line">Capacidad Falla por grupo (Qub_gb): <strong id="r_qu_bloque"></strong> kN</div>
                 <br>
                 <div class="res-line">Carga Admisible del Grupo (Qadm_grupo): <strong id="r_qadm_grupo"></strong> kN</div>
                 <div class="res-line">Eficiencia del Grupo [N = Qadm_grupo / (n × Qadm_ind)]: <strong id="r_eficiencia"></strong></div>
@@ -474,6 +476,7 @@
             const peso_g = document.getElementById('peso_g').value;
             const bg_g = document.getElementById('bg_g').value;
             const lg_g = document.getElementById('lg_g').value;
+            const longitud_g = document.getElementById('longitud_g').value;
             
             const dim_d = document.getElementById('dim_d') ? document.getElementById('dim_d').value : 0;
             const dim_b = document.getElementById('dim_b') ? document.getElementById('dim_b').value : 0;
@@ -521,6 +524,7 @@
                 peso_g: peso_g,
                 bg_g: bg_g,
                 lg_g: lg_g,
+                longitud_g: longitud_g,
                 dim_d: dim_d,
                 dim_b: dim_b,
                 dim_l: dim_l,
@@ -564,13 +568,11 @@
             document.getElementById('r_rho_b').textContent = data.rho_b.toFixed(4);
             document.getElementById('r_asentamiento').textContent = data.asentamiento_mm.toFixed(4);
 
-            // INYECCIÓN DINÁMICA DE LA IMAGEN DEL ESTRATO (Solo muestra una)
             const divImgs = document.getElementById('imagenes_estratos_dinamicas');
             divImgs.innerHTML = '';
             const totalEstratos = data.detalles_friccion.length; 
             
             if (totalEstratos > 0) {
-                // Limitamos a 6 para evitar que busque un archivo que no existe
                 const imgIndex = Math.min(totalEstratos, 6);
                 divImgs.innerHTML = `
                     <div class="carta-estrato">
