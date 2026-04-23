@@ -50,11 +50,11 @@ def calcular():
     elif material == 'madera':
         gamma_p = 9.0
         e_p = 10000000.0
-        delta_factor = 0.8
+        delta_factor = 1.0
     else: 
         gamma_p = 78.0
         e_p = 200000000.0
-        delta_factor = 0.7
+        delta_factor = 0.8
         
     peso = area * l * gamma_p
     
