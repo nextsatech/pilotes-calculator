@@ -27,8 +27,6 @@
         .slide {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            /* 'contain' evita que la imagen se recorte, 'cover' llena la pantalla. 
-               Usamos 'contain' asumiendo que son infografías con texto importante */
             background-size: contain; 
             background-repeat: no-repeat;
             background-position: center;
@@ -44,7 +42,7 @@
 
         /* Rutas hacia la carpeta estática de Flask */
         .slide-portada { background-image: url('/static/portada.jpeg'); }
-        .slide-1 { background-image: url('/static/pilote.jpeg'); }
+        .slide-1 { background-image: url('/static/pilote1.jpeg'); }
         .slide-2 { background-image: url('/static/pilote2.jpeg'); }
         .slide-3 { background-image: url('/static/pilote3.jpeg'); }
 
@@ -55,7 +53,7 @@
             z-index: 10;
         }
 
-        /* Botón de aspecto limpio y tradicional (no generado por IA) */
+        /* Botón de aspecto limpio y tradicional */
         .btn-siguiente {
             background-color: #ffffff;
             color: #333333;
@@ -74,7 +72,9 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
 
-       
+        /* =========================================
+           RESTO DEL DISEÑO PRINCIPAL DE LA APP
+           ========================================= */
         #app-principal {
             display: none; 
             max-width: 950px;
@@ -157,34 +157,28 @@
             border-radius: 6px;
         }
         
-        /* Contenedor para las imágenes de los estratos individuales */
+        /* Contenedor para la imagen única del perfil de estratos */
         .contenedor-imagenes-estratos {
             display: flex; 
-            gap: 20px; 
             margin-top: 25px; 
             margin-bottom: 40px;
-            flex-wrap: wrap; 
             justify-content: center;
         }
         .carta-estrato {
             text-align: center;
-            background: #f9f9f9;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #eaeaea;
         }
         .contenedor-imagenes-estratos img {
             width: 100%;
-            max-width: 220px;
-            height: 160px;
-            object-fit: cover;
-            border-radius: 6px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            max-width: 450px; /* Ajustado para que se vea grande y centrada */
+            height: auto;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
         .titulo-estrato {
-            margin-top: 10px;
+            margin-top: 15px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 15px;
             color: #555;
         }
     </style>
@@ -245,7 +239,7 @@
             </div>
 
             <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
-                <label style="margin: 0; font-weight: bold;">N° Estratos (Suelo General):</label>
+                <label style="margin: 0; font-weight: bold;">N° Estratos:</label>
                 <input type="number" id="num_estratos" value="1" min="1" max="5" style="width: 60px;">
                 <button type="button" id="btnGenerar" class="btn-accion" style="margin: 0;">Generar Estratos</button>
             </div>
@@ -319,10 +313,10 @@
 
             <div id="seccion_grupo" style="display:none; margin-top: 40px;">
                 <h2 style="border-bottom: 2px solid #ccc; padding-bottom: 5px;">Análisis de Grupo de Pilotes</h2>
-                <div class="res-line">Resistencia por fuste del bloque (Σ Qf_bloque): <strong id="r_qs_bloque"></strong> kN</div>
-                <div class="res-line">Resistencia por punta del bloque (Qb_bloque): <strong id="r_qb_bloque"></strong> kN</div>
-                <div class="res-line">Peso del bloque (W_bloque): <strong id="r_peso_bloque"></strong> kN</div>
-                <div class="res-line">Capacidad Falla por Bloque (Qub_gb): <strong id="r_qu_bloque"></strong> kN</div>
+                <div class="res-line">Resistencia por fuste (Σ Qf_g): <strong id="r_qs_bloque"></strong> kN</div>
+                <div class="res-line">Resistencia por punta (Qb_g): <strong id="r_qb_bloque"></strong> kN</div>
+                <div class="res-line">Peso (Wp_g): <strong id="r_peso_bloque"></strong> kN</div>
+                <div class="res-line">Capacidad Falla (Qu_gb): <strong id="r_qu_bloque"></strong> kN</div>
                 <br>
                 <div class="res-line">Carga Admisible del Grupo (Qadm_grupo): <strong id="r_qadm_grupo"></strong> kN</div>
                 <div class="res-line">Eficiencia del Grupo [N = Qadm_grupo / (n × Qadm_ind)]: <strong id="r_eficiencia"></strong></div>
@@ -331,10 +325,10 @@
                 <div class="res-line">Asentamiento por acortamiento del bloque (ρp_grupo): <strong id="r_rho_p_g"></strong> mm</div>
                 <div id="lista_rho_p_g" style="margin-left: 20px; margin-bottom: 10px; font-size: 14px; color: #555;"></div>
                 
-                <div class="res-line">Asentamiento por fricción del bloque (ρes_grupo): <strong id="r_rho_es_g"></strong> mm</div>
+                <div class="res-line">Asentamiento por fricción (ρes_grupo): <strong id="r_rho_es_g"></strong> mm</div>
                 <div id="lista_rho_es_g" style="margin-left: 20px; margin-bottom: 10px; font-size: 14px; color: #555;"></div>
                 
-                <div class="res-line">Asentamiento en la base del bloque (ρb_grupo): <strong id="r_rho_b_g"></strong> mm</div>
+                <div class="res-line">Asentamiento en la base (ρb_grupo): <strong id="r_rho_b_g"></strong> mm</div>
                 <br>
                 <div class="res-line"><strong>Asentamiento Elástico Total del Grupo: <span id="r_asentamiento_g"></span> mm</strong></div>
 
@@ -570,16 +564,18 @@
             document.getElementById('r_rho_b').textContent = data.rho_b.toFixed(4);
             document.getElementById('r_asentamiento').textContent = data.asentamiento_mm.toFixed(4);
 
-            // INYECCIÓN DINÁMICA DE IMÁGENES DE ESTRATOS
-            // Aparecen justo después del análisis individual y antes del de grupo
+            // INYECCIÓN DINÁMICA DE LA IMAGEN DEL ESTRATO (Solo muestra una)
             const divImgs = document.getElementById('imagenes_estratos_dinamicas');
             divImgs.innerHTML = '';
             const totalEstratos = data.detalles_friccion.length; 
-            for(let i = 1; i <= Math.min(totalEstratos, 6); i++) {
-                divImgs.innerHTML += `
+            
+            if (totalEstratos > 0) {
+                // Limitamos a 6 para evitar que busque un archivo que no existe
+                const imgIndex = Math.min(totalEstratos, 6);
+                divImgs.innerHTML = `
                     <div class="carta-estrato">
-                        <img src="/static/estrato_${i}.jpeg" alt="Estrato ${i}" onerror="this.style.display='none'">
-                        <div class="titulo-estrato">Estrato ${i}</div>
+                        <img src="/static/estrato_${imgIndex}.jpeg" alt="${imgIndex} estratos" onerror="this.style.display='none'">
+                        <div class="titulo-estrato">Perfil del Suelo (${imgIndex} Estratos)</div>
                     </div>
                 `;
             }
